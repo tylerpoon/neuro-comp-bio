@@ -1,2 +1,2 @@
 # neuro-comp-bio
-for school
+Kauffman NK Model in python 
