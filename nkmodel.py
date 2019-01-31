@@ -23,7 +23,7 @@ steps = int(input("Steps: "))
 nodes = []
 
 for i in range(0, N):
-    nodes.append((bool(random.getrandbits(1)), random.sample([x for x in range(N) if x != i], K), [bool(random.getrandbits(2**K) & (1<<n)) for n in range(2**K)]))
+    nodes.append((bool(random.getrandbits(1)), random.sample([x for x in range(N) if x != i], K), [bool(random.getrandbits(1)) for n in range(2**K)]))
 
 print('start: ', end='')
 print_nodes(nodes)
