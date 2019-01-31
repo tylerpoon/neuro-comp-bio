@@ -4,7 +4,7 @@ import sys
 def step(nodes):
     new_nodes = []
     for n in nodes: 
-        in_bits = [sum([1<<i for i, b in enumerate(map(lambda x: nodes[x][0], n[1])) if b])]
+        in_bits = sum([1<<i for i, b in enumerate(map(lambda x: nodes[x][0], n[1])) if b])
         if in_bits not in n[2]:
             n[2][in_bits] = bool(random.getrandbits(1))
         new_nodes.append((n[2][in_bits], n[1], n[2]))
