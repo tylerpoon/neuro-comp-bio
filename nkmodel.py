@@ -44,4 +44,5 @@ def main():
 
     step_loop(nodes, steps, print_every)
 
-main()
+if __name__ == "__main__":
+    main()
