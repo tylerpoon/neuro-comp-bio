@@ -77,8 +77,8 @@ def main():
     if N < K:
         parser.error("N must be greater than K")
     D = args.D
-    if D < 1:
-        parser.error("D must be 1 or greater")
+    if D < 0:
+        parser.error("D must be 0 or greater")
     steps = args.steps
     print_every = args.print_every
 
