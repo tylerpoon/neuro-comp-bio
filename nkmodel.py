@@ -15,14 +15,53 @@ def step(nodes):
 def print_nodes(nodes):
     print(''.join(['1' if n[0] else '0' for n in nodes]))
 
+def print_state(state):
+    print(''.join(['1' if s else '0' for s in state]))
+
+def print_attractor(s):
+    sset = set()
+    attract_start = []
+    attract_end_index = 0
+    num_s = []
+    for v in s:
+        num_s.append(sum([1<<i for i, b in enumerate(v) if b]))
+
+    for i, v in enumerate(num_s):
+        if v in sset:
+            attract_start = v
+            attract_end_index = i
+            break;
+        else:
+            sset.add(v)
+
+    if attract_start == []:
+        return;
+
+    attract_start_index = num_s.index(attract_start)
+
+    attractor = s[attract_start_index:attract_end_index]
+    print("\nAttractor:")
+    for i, s in enumerate(attractor):
+        print_state(s)
+        print('↓')
+    print_state(attractor[0])
+
 def step_loop(nodes, steps, print_every=1):
+    states = [[]]
     print('start: ', end='')
     print_nodes(nodes)
+    for n in nodes:
+        states[0].append(n[0])
     for i in range(steps):
         nodes = step(nodes)
         if i % print_every == 0:
             print(str(i + 1) + ': ', end='')
             print_nodes(nodes)
+        state = []
+        for n in nodes:
+           state.append(n[0]) 
+        states.append(state)
+    print_attractor(states)
 
 def main():
     parser = argparse.ArgumentParser(description='NK Model Parameter handler')
@@ -54,8 +93,7 @@ def main():
         for i in range(D-1):
             print('\n\n')
             new_start_state = start_state
-            flip = random.randint(0, len(nodes)-1)
-            new_start_state[flip] = not new_start_state[flip]
+            new_start_state[i] = not new_start_state[i]
             new_nodes = []
             for j in range(0, N):
                 new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
