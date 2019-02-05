@@ -92,7 +92,7 @@ def main():
     step_loop(nodes, steps, print_every)
     for i in range(D):
         print('\n')
-        new_start_state = start_state
+        new_start_state = start_state.copy()
         new_start_state[i] = not new_start_state[i]
         new_nodes = []
         for j in range(0, N):
