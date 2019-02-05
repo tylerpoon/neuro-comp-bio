@@ -26,8 +26,8 @@ def step_loop(nodes, steps, print_every=1):
 
 def main():
     parser = argparse.ArgumentParser(description='NK Model Parameter handler')
-    parser.add_argument('-N', dest="N", type=int, required=True)
-    parser.add_argument('-K', dest="K", type=int, required=True)    
+    parser.add_argument('-n', dest="N", type=int, required=True)
+    parser.add_argument('-k', dest="K", type=int, required=True)    
     parser.add_argument('--steps', '-s', dest="steps", type=int, required=True)
     parser.add_argument('--print-every', '-p', dest='print_every', type=int, default=1)
     args = parser.parse_args()
