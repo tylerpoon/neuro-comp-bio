@@ -35,6 +35,7 @@ def print_attractor(s):
             sset.add(v)
 
     if attract_start == []:
+        print("\nNo Atrractor:")
         return;
 
     attract_start_index = num_s.index(attract_start)
@@ -68,7 +69,7 @@ def main():
     parser.add_argument('-n', dest="N", type=int, required=True)
     parser.add_argument('-k', dest="K", type=int, required=True)    
     parser.add_argument('--steps', '-s', dest="steps", type=int, required=True)
-    parser.add_argument('-d', dest="D", type=int, default=1)
+    parser.add_argument('-d', dest="D", type=int, default=0)
     parser.add_argument('--print-every', '-p', dest='print_every', type=int, default=1)
     args = parser.parse_args()
     N = args.N
@@ -89,15 +90,14 @@ def main():
         nodes.append((bit, random.sample([x for x in range(N) if x != i], K), {}))
 
     step_loop(nodes, steps, print_every)
-    if D > 1:
-        for i in range(D-1):
-            print('\n\n')
-            new_start_state = start_state
-            new_start_state[i] = not new_start_state[i]
-            new_nodes = []
-            for j in range(0, N):
-                new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
-            step_loop(new_nodes, steps, print_every)
+    for i in range(D):
+        print('\n')
+        new_start_state = start_state
+        new_start_state[i] = not new_start_state[i]
+        new_nodes = []
+        for j in range(0, N):
+            new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
+        step_loop(new_nodes, steps, print_every)
 
 if __name__ == "__main__":
     main()
