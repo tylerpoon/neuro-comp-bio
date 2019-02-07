@@ -1,6 +1,7 @@
 import random
 import sys
 import argparse
+from collections import Counter
 
 def step(nodes):
     new_nodes = []
@@ -18,7 +19,18 @@ def print_nodes(nodes):
 def print_state(state):
     print(''.join(['1' if s else '0' for s in state]))
 
-def print_attractor(s):
+def print_attractor(a):
+    if a == []:
+        print("No Atrractor:")
+        return;
+
+    print("Attractor:")
+    for i, s in enumerate(a):
+        print_state(s)
+        print('↓')
+    print_state(a[0])
+
+def get_attractor(s):
     sset = set()
     attract_start = []
     attract_end_index = 0
@@ -35,22 +47,19 @@ def print_attractor(s):
             sset.add(v)
 
     if attract_start == []:
-        print("No Atrractor:")
-        return;
+        return [];
 
     attract_start_index = num_s.index(attract_start)
-
     attractor = s[attract_start_index:attract_end_index]
-    print("Attractor:")
-    for i, s in enumerate(attractor):
-        print_state(s)
-        print('↓')
-    print_state(attractor[0])
+    attractor = tuple(map(tuple, attractor))
+
+    return attractor
 
 def step_loop(nodes, steps, print_every=1, no_out=False):
     states = [[]]
-    print('start: ', end='')
-    print_nodes(nodes)
+    if not no_out:
+        print('start: ', end='')
+        print_nodes(nodes)
     for n in nodes:
         states[0].append(n[0])
     for i in range(steps):
@@ -63,14 +72,17 @@ def step_loop(nodes, steps, print_every=1, no_out=False):
         for n in nodes:
            state.append(n[0]) 
         states.append(state)
-    print_attractor(states)
+    attractor = get_attractor(states)
+    if not no_out:
+        print_attractor(attractor)
+    return attractor
 
 def main():
     parser = argparse.ArgumentParser(description='NK Model Parameter handler')
     parser.add_argument('-n', dest="N", type=int, required=True)
     parser.add_argument('-k', dest="K", type=int, required=True)    
     parser.add_argument('--steps', '-s', dest="steps", type=int, required=True)
-    parser.add_argument('-d', dest="D", type=int, default=0)
+    parser.add_argument('-d', action='store_true')
     parser.add_argument('--print-every', '-p', dest='print_every', type=int, default=1)
     parser.add_argument('-c', action='store_true')
     args = parser.parse_args()
@@ -78,9 +90,6 @@ def main():
     K = args.K
     if N < K:
         parser.error("N must be greater than K")
-    D = args.D
-    if D < 0:
-        parser.error("D must be 0 or greater")
     steps = args.steps
     print_every = args.print_every
 
@@ -91,15 +100,27 @@ def main():
         start_state.append(bit)
         nodes.append((bit, random.sample([x for x in range(N) if x != i], K), {}))
 
-    step_loop(nodes, steps, print_every, args.c)
-    for i in range(D):
-        print('\n')
-        new_start_state = start_state.copy()
-        new_start_state[i] = not new_start_state[i]
-        new_nodes = []
-        for j in range(0, N):
-            new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
-        step_loop(new_nodes, steps, print_every, args.c)
+    start_attractor = step_loop(nodes, steps, print_every, args.c)
+    neighbor_attractors = []
+    if args.d:
+        for i in range(N):
+            if not args.c:
+                print('\nNeighbor ' + str(i+1))
+            new_start_state = start_state.copy()
+            new_start_state[i] = not new_start_state[i]
+            new_nodes = []
+            for j in range(0, N):
+                new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
+            neighbor_attractors.append(step_loop(new_nodes, steps, print_every, args.c))
+
+        counted_attractors = dict(Counter(neighbor_attractors))
+
+        print('\nStart Attractor:')
+        print_attractor(start_attractor)
+        print('\nNeighbor Attractors:')
+        for i, v in counted_attractors.items():
+            print_attractor(i)
+            print(str(v) + ' neighbors\n')
 
 if __name__ == "__main__":
     main()
