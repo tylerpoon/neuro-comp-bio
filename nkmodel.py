@@ -10,7 +10,7 @@ def step(nodes):
         if in_bits not in n[2]:
             n[2][in_bits] = bool(random.getrandbits(1))
         new_nodes.append((n[2][in_bits], n[1], n[2]))
-        
+
     return new_nodes
 
 def print_nodes(nodes):
@@ -71,7 +71,7 @@ def step_loop(nodes, steps, print_every=1, no_out=False):
                 print_nodes(nodes)
         state = []
         for n in nodes:
-           state.append(n[0]) 
+            state.append(n[0]) 
         states.append(state)
     attractor = get_attractor(states)
     if not no_out:
@@ -117,14 +117,15 @@ def main():
         counted_attractors = dict(Counter(neighbor_attractors))
         set_attractors = {}
 
-        print('\nStart Attractor:')
-        print_attractor(start_attractor)
-        print('\nNeighbor Attractors:')
         for i, v in counted_attractors.items():
             if tuple(sorted(i)) not in set_attractors:
                 set_attractors[tuple(sorted(i))] = (v, i)
             elif tuple(sorted(i)) in set_attractors:
                 set_attractors[tuple(sorted(i))] = (set_attractors[tuple(sorted(i))][0] + v, set_attractors[tuple(sorted(i))][1])
+        print('\nStart Attractor:')
+        print_attractor(start_attractor)
+        print('percentage neighbors: ' + str((set_attractors[tuple(sorted(start_attractor))][0]/N) * 100) + '%')
+        print('\nNeighbor Attractors:')
         for i, v in set_attractors.items():
             print_attractor(v[1])
             print(str(v[0]) + ' neighbors\n')
