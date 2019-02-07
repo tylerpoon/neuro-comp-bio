@@ -35,19 +35,19 @@ def print_attractor(s):
             sset.add(v)
 
     if attract_start == []:
-        print("\nNo Atrractor:")
+        print("No Atrractor:")
         return;
 
     attract_start_index = num_s.index(attract_start)
 
     attractor = s[attract_start_index:attract_end_index]
-    print("\nAttractor:")
+    print("Attractor:")
     for i, s in enumerate(attractor):
         print_state(s)
         print('↓')
     print_state(attractor[0])
 
-def step_loop(nodes, steps, print_every=1):
+def step_loop(nodes, steps, print_every=1, no_out=False):
     states = [[]]
     print('start: ', end='')
     print_nodes(nodes)
@@ -55,9 +55,10 @@ def step_loop(nodes, steps, print_every=1):
         states[0].append(n[0])
     for i in range(steps):
         nodes = step(nodes)
-        if i % print_every == 0:
-            print(str(i + 1) + ': ', end='')
-            print_nodes(nodes)
+        if not no_out:
+            if i % print_every == 0:
+                print(str(i + 1) + ': ', end='')
+                print_nodes(nodes)
         state = []
         for n in nodes:
            state.append(n[0]) 
@@ -71,6 +72,7 @@ def main():
     parser.add_argument('--steps', '-s', dest="steps", type=int, required=True)
     parser.add_argument('-d', dest="D", type=int, default=0)
     parser.add_argument('--print-every', '-p', dest='print_every', type=int, default=1)
+    parser.add_argument('-c', action='store_true')
     args = parser.parse_args()
     N = args.N
     K = args.K
@@ -89,7 +91,7 @@ def main():
         start_state.append(bit)
         nodes.append((bit, random.sample([x for x in range(N) if x != i], K), {}))
 
-    step_loop(nodes, steps, print_every)
+    step_loop(nodes, steps, print_every, args.c)
     for i in range(D):
         print('\n')
         new_start_state = start_state.copy()
@@ -97,7 +99,7 @@ def main():
         new_nodes = []
         for j in range(0, N):
             new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
-        step_loop(new_nodes, steps, print_every)
+        step_loop(new_nodes, steps, print_every, args.c)
 
 if __name__ == "__main__":
     main()
