@@ -20,8 +20,8 @@ def print_state(state):
     print(''.join(['1' if s else '0' for s in state]))
 
 def print_attractor(a):
-    if a == []:
-        print("No Atrractor:")
+    if a == ():
+        print("No Attractor:")
         return;
 
     print("Attractor:")
@@ -48,7 +48,7 @@ def get_attractor(s):
             sset.add(v)
 
     if attract_start == []:
-        return [];
+        return ();
 
     attract_start_index = num_s.index(attract_start)
     attractor = s[attract_start_index:attract_end_index]
