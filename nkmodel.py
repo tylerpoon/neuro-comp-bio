@@ -29,6 +29,7 @@ def print_attractor(a):
         print_state(s)
         print('↓')
     print_state(a[0])
+    print('period: ' + str(len(a)))
 
 def get_attractor(s):
     sset = set()
@@ -114,13 +115,19 @@ def main():
             neighbor_attractors.append(step_loop(new_nodes, steps, print_every, args.c))
 
         counted_attractors = dict(Counter(neighbor_attractors))
+        set_attractors = {}
 
         print('\nStart Attractor:')
         print_attractor(start_attractor)
         print('\nNeighbor Attractors:')
         for i, v in counted_attractors.items():
-            print_attractor(i)
-            print(str(v) + ' neighbors\n')
+            if tuple(sorted(i)) not in set_attractors:
+                set_attractors[tuple(sorted(i))] = (v, i)
+            elif tuple(sorted(i)) in set_attractors:
+                set_attractors[tuple(sorted(i))] = (set_attractors[tuple(sorted(i))][0] + v, set_attractors[tuple(sorted(i))][1])
+        for i, v in set_attractors.items():
+            print_attractor(v[1])
+            print(str(v[0]) + ' neighbors\n')
 
 if __name__ == "__main__":
     main()
