@@ -3,18 +3,98 @@ import sys
 import argparse
 from collections import Counter
 
-def step(nodes):
-    new_nodes = []
-    for n in nodes: 
-        in_bits = sum([1<<i for i, b in enumerate(map(lambda x: nodes[x][0], n[1])) if b])
-        if in_bits not in n[2]:
-            n[2][in_bits] = bool(random.getrandbits(1))
-        new_nodes.append((n[2][in_bits], n[1], n[2]))
+class Network:
+    def __init__(self, n, k, start_state=[], start_conns=[], start_funcs=[]):
+        self.nodes = [] 
+        self.start_conns = []
+        if start_conns == []:
+            for i in range(0, n):
+                self.start_conns.append(random.sample([x for x in range(n) if x != i], k))
+        else:
+            self.start_conns = start_conns
 
-    return new_nodes
+        if start_funcs == []:
+            start_funcs = [{} for i in range(n)]
 
-def print_nodes(nodes):
-    print(''.join(['1' if n[0] else '0' for n in nodes]))
+        self.start_state = []
+        if start_state == []:
+            for i in range(0, n):
+                bit = bool(random.getrandbits(1))
+                self.start_state.append(bit)
+                self.nodes.append((bit, self.start_conns[i], start_funcs[i]))
+        else:
+            self.start_state = start_state
+            for i in range(0, n):
+                self.nodes.append((self.start_state[i], self.start_conns[i], start_funcs[i]))
+    
+        self.states = [[]]
+        for n in self.nodes:
+            self.states[0].append(n[0])
+
+    def step(self):
+        new_nodes = []
+        for n in self.nodes: 
+            in_bits = sum([1<<i for i, b in enumerate(map(lambda x: self.nodes[x][0], n[1])) if b])
+            if in_bits not in n[2]:
+                n[2][in_bits] = bool(random.getrandbits(1))
+            new_nodes.append((n[2][in_bits], n[1], n[2]))
+        self.nodes = new_nodes
+        state = []
+        for n in self.nodes:
+            state.append(n[0]) 
+        self.states.append(state)
+
+    def step_loop(self, steps, print_every=1, no_out=False):
+        if not no_out:
+            print('start: ', end='')
+            self.print_nodes()
+        for i in range(steps):
+            self.step()
+            if not no_out:
+                if i % print_every == 0:
+                    print(str(i + 1) + ': ', end='')
+                    self.print_nodes()
+    
+    def get_start_state(self):
+        return self.start_state
+
+    def get_start_conns(self):
+        return self.start_conns
+
+    def get_funcs(self):
+        funcs = []
+        for n in self.nodes:
+            funcs.append(n[2])
+
+        return funcs
+        
+    def get_attractor(self):
+        sset = set()
+        attract_start = []
+        attract_end_index = 0
+        num_s = []
+        for v in self.states:
+            num_s.append(sum([1<<i for i, b in enumerate(v) if b]))
+
+        for i, v in enumerate(num_s):
+            if v in sset:
+                attract_start = v
+                attract_end_index = i
+                break;
+            else:
+                sset.add(v)
+
+        if attract_start == []:
+            return ();
+
+        attract_start_index = num_s.index(attract_start)
+        attractor = self.states[attract_start_index:attract_end_index]
+        attractor = tuple(map(tuple, attractor))
+
+        return attractor
+
+    def print_nodes(self):
+        print(''.join(['1' if n[0] else '0' for n in self.nodes]))
 
 def print_state(state):
     print(''.join(['1' if s else '0' for s in state]))
@@ -30,53 +110,6 @@ def print_attractor(a):
         print('↓')
     print_state(a[0])
     print('period: ' + str(len(a)))
-
-def get_attractor(s):
-    sset = set()
-    attract_start = []
-    attract_end_index = 0
-    num_s = []
-    for v in s:
-        num_s.append(sum([1<<i for i, b in enumerate(v) if b]))
-
-    for i, v in enumerate(num_s):
-        if v in sset:
-            attract_start = v
-            attract_end_index = i
-            break;
-        else:
-            sset.add(v)
-
-    if attract_start == []:
-        return ();
-
-    attract_start_index = num_s.index(attract_start)
-    attractor = s[attract_start_index:attract_end_index]
-    attractor = tuple(map(tuple, attractor))
-
-    return attractor
-
-def step_loop(nodes, steps, print_every=1, no_out=False):
-    states = [[]]
-    if not no_out:
-        print('start: ', end='')
-        print_nodes(nodes)
-    for n in nodes:
-        states[0].append(n[0])
-    for i in range(steps):
-        nodes = step(nodes)
-        if not no_out:
-            if i % print_every == 0:
-                print(str(i + 1) + ': ', end='')
-                print_nodes(nodes)
-        state = []
-        for n in nodes:
-            state.append(n[0]) 
-        states.append(state)
-    attractor = get_attractor(states)
-    if not no_out:
-        print_attractor(attractor)
-    return attractor
 
 def main():
     parser = argparse.ArgumentParser(description='NK Model Parameter handler')
@@ -94,25 +127,19 @@ def main():
     steps = args.steps
     print_every = args.print_every
 
-    nodes = []
-    start_state = []
-    for i in range(0, N):
-        bit = bool(random.getrandbits(1))
-        start_state.append(bit)
-        nodes.append((bit, random.sample([x for x in range(N) if x != i], K), {}))
-
-    start_attractor = step_loop(nodes, steps, print_every, args.c)
+    start_network = Network(N, K)
+    start_network.step_loop(steps, print_every, args.c)
+    start_attractor = start_network.get_attractor()
     neighbor_attractors = []
     if args.d:
         for i in range(N):
             if not args.c:
                 print('\nNeighbor ' + str(i+1))
-            new_start_state = start_state.copy()
+            new_start_state = start_network.get_start_state().copy()
             new_start_state[i] = not new_start_state[i]
-            new_nodes = []
-            for j in range(0, N):
-                new_nodes.append((new_start_state[j], nodes[j][1], nodes[j][2]))
-            neighbor_attractors.append(step_loop(new_nodes, steps, print_every, args.c))
+            new_network = Network(N, K, new_start_state, start_network.get_start_conns().copy(), start_network.get_funcs())
+            new_network.step_loop(steps, print_every, args.c)
+            neighbor_attractors.append(new_network.get_attractor())
 
         counted_attractors = dict(Counter(neighbor_attractors))
         set_attractors = {}
