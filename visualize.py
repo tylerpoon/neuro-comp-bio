@@ -8,10 +8,10 @@ class Application(tk.Frame):
         self.master = master
         self.pack()
 
-        self.canvas = tk.Canvas(self, width=800, height=650)
+        self.canvas = tk.Canvas(self, width=800, height=670)
         self.canvas.pack()
 
-        self.control_frame = tk.Frame(self, width=250, height=600)
+        self.control_frame = tk.Frame(self, width=250, height=200)
         self.control_frame.pack(side=tk.RIGHT)
 
         self.n_label = tk.Label(self.control_frame, text="N:")
@@ -45,7 +45,7 @@ class Application(tk.Frame):
         self.canvas.delete("all")
         self.circles = []
         center_width = self.canvas.winfo_width()/2
-        center_height = self.canvas.winfo_height()/2 - 50
+        center_height = self.canvas.winfo_height()/2 - 20
         state = self.nodes.get_state()
 
         for i, b in enumerate(state):
