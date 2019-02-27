@@ -61,12 +61,20 @@ class Network:
     def get_start_conns(self):
         return self.start_conns
 
-    def get_funcs(self):
-        funcs = []
-        for n in self.nodes:
-            funcs.append(n[2])
+    def get_state(self):
+        return [n[0] for n in self.nodes]
 
-        return funcs
+    def get_conns(self):
+        return [n[1] for n in self.nodes]
+
+    def get_funcs(self):
+        return [n[2] for n in self.nodes]
+
+    def get_n(self):
+        return len(self.nodes)
+
+    def get_k(self):
+        return len(self.nodes[0][1])
         
     def get_attractor(self):
         sset = set()
