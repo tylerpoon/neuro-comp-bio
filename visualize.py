@@ -62,7 +62,7 @@ class Application(tk.Frame):
             start_coords = self.canvas.coords(self.circles[i])
             for c in l:
                 end_coords = self.canvas.coords(self.circles[c]) 
-                self.canvas.create_line(start_coords[0] + 20, start_coords[1] + 20, end_coords[0] + 20, end_coords[1] + 20, arrow=tk.LAST)
+                self.canvas.create_line(start_coords[0] + 20, start_coords[1] + 20, end_coords[0] + 20, end_coords[1] + 20, arrow=tk.FIRST)
 
     def new_state(self):
         self.nodes = nk.Network(self.nodes.get_n(), self.nodes.get_k(), start_conns=self.nodes.get_start_conns(), start_funcs=self.nodes.get_funcs()) 
