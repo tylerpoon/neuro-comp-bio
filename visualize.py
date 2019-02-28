@@ -30,10 +30,10 @@ class Application(tk.Frame):
         self.new_network_button.pack()
 
         self.new_state_button = tk.Button(self.control_frame, text="New State", command=self.new_state)
-        self.new_state_button.pack()
+        self.new_state_button.pack(side=tk.LEFT)
 
         self.step_button = tk.Button(self.control_frame, text="Step", command=self.step)
-        self.step_button.pack()
+        self.step_button.pack(side=tk.LEFT)
 
     def new_network(self):
         n = int(self.n_entry.get())
